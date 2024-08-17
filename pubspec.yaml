@@ -90,12 +90,12 @@ flutter:
   fonts:
      - family: Google fonts
        fonts:
-         - asset: lib/Assets/EduVICWANTBeginner-Regular.ttf
-         - asset: lib/Assets/EduVICWANTBeginner-SemiBold.ttf
+         - asset: lib/Assets/fonts/EduVICWANTBeginner-Regular.ttf
+         - asset: lib/Assets/fonts/EduVICWANTBeginner-SemiBold.ttf
            weight: 600
-         - asset: lib/Assets/EduVICWANTBeginner-Bold.ttf
+         - asset: lib/Assets/fonts/EduVICWANTBeginner-Bold.ttf
            weight: 700
-         - asset: lib/Assets/EduVICWANTBeginner-Medium.ttf
+         - asset: lib/Assets/fonts/EduVICWANTBeginner-Medium.ttf
            weight: 500
 
   # For details regarding fonts from package dependencies,
