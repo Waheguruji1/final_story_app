@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rive/rive.dart' hide Image;
@@ -10,6 +9,7 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:vibration/vibration.dart';
 import 'package:animated_text_kit/animated_text_kit.dart' ;
 import 'package:flutter_animated_button/flutter_animated_button.dart';
+import 'package:share_plus/share_plus.dart';
 import 'story.dart';
 
 const String interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
@@ -322,9 +322,21 @@ class _StoryPageState extends ConsumerState<StoryPage> {
     );
   }
 
+
+
   Widget _buildDrawer() {
     final vibrationEnabled = ref.watch(vibrationEnabledProvider);
-    final backgroundOpacity = ref.watch(backgroundOpacityProvider);
+
+    Future<void> _shareApp() async {
+      final prefs = await SharedPreferences.getInstance();
+      final userName = prefs.getString('user_name') ?? 'a friend';
+
+      final String appLink = 'https://yourapplink.com'; // Replace with your app's link
+      final String message = 'Check out this amazing app recommended by $userName! Download it now: $appLink';
+
+      await Share.share(message, subject: 'Check out this great app!');
+    }
+
     return Drawer(
       child: SafeArea(
         child: ListView(
@@ -352,16 +364,12 @@ class _StoryPageState extends ConsumerState<StoryPage> {
               },
             ),
             ListTile(
-              title: Text('Background Opacity'),
-              subtitle: Slider(
-                value: backgroundOpacity,
-                min: 0.0,
-                max: 1.0,
-                divisions: 10,
-                onChanged: (double value) {
-                  ref.read(backgroundOpacityProvider.notifier).state = value;
-                },
-              ),
+              title: Text('Share App'),
+              leading: Icon(Icons.share),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                _shareApp(); // Call the share function
+              },
             ),
           ],
         ),
@@ -377,7 +385,7 @@ class _StoryPageState extends ConsumerState<StoryPage> {
         animatedTexts: [
           TypewriterAnimatedText(
             storyNode.text,
-            textStyle: TextStyle(fontFamily: ""),
+            textStyle: TextStyle(fontFamily: "Google fonts",fontWeight: FontWeight.w500),
             textAlign: TextAlign.center,
             speed: Duration(milliseconds: 100),
           ),
@@ -394,46 +402,38 @@ class _StoryPageState extends ConsumerState<StoryPage> {
 
 
   // Example: Manually controlling speed
+
+
+
   Widget _buildAnimation(StoryNode storyNode) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      child: FutureBuilder<void>(
-        future: _loadRiveAnimation(storyNode.animation),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done && !snapshot.hasError) {
-            return RiveAnimation.asset(
-              'lib/Assets/${storyNode.animation}',
-              fit: BoxFit.contain,
-              onInit: (Artboard artboard) {
-                final controller = SimpleAnimation('idle');
-                controller.instance?.animation.speed = 0.4;
-                artboard.addController(controller);
-                print('Rive animation loaded successfully');
-              },
-            );
-          } else if (snapshot.hasError) {
-            print('Error loading Rive animation: ${snapshot.error}');
-            return Image.asset(
-              'lib/Assets/${storyNode.image}', // Fallback to an image asset
-              fit: BoxFit.contain,
-            );
-          } else {
-            return Center(child: CircularProgressIndicator()); // Loading state
-          }
-        },
-      ),
+    return Builder(
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.4,
+          child: FutureBuilder<RiveFile>(
+            future: RiveFile.asset('lib/Assets/${storyNode.animation}'),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                return RiveAnimation.direct(
+                  snapshot.data!,
+                  fit: BoxFit.contain,
+                );
+              } else if (snapshot.hasError) {
+                // Fallback to image if Rive animation fails to load
+                return Image.asset(
+                  'lib/Assets/${storyNode.image}',
+                  fit: BoxFit.contain,
+                );
+              } else {
+                // Show a loading indicator while the animation is being loaded
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        );
+      },
     );
   }
-
-  Future<void> _loadRiveAnimation(String animationPath) async {
-    try {
-      // Attempt to load the Rive file
-      await rootBundle.load('lib/Assets/$animationPath');
-    } catch (error) {
-      throw Exception('Failed to load Rive animation: $error');
-    }
-  }
-
 
 
 
@@ -450,6 +450,7 @@ class _StoryPageState extends ConsumerState<StoryPage> {
             vertical: 8.0, horizontal: 16.0),
         child: AnimatedTapButton(
           text: choice.text,
+
           onCompleted: () {
             ref.read(currentStoryNodeProvider.notifier).state =
                 choice.nextNode;
@@ -482,7 +483,7 @@ class AnimatedTapButton extends ConsumerStatefulWidget {
 
 class _AnimatedTapButtonState extends ConsumerState<AnimatedTapButton> {
   final ValueNotifier<bool> _isAnimating = ValueNotifier<bool>(false);
-  final int _animationDuration = 5; // 2 seconds for animation
+  final int _animationDuration = 2; // 2 seconds for animation
 
   @override
   void dispose() {
@@ -492,38 +493,37 @@ class _AnimatedTapButtonState extends ConsumerState<AnimatedTapButton> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _onTapDown(),
-      child: ValueListenableBuilder<bool>(
-        valueListenable: _isAnimating,
-        builder: (context, isAnimating, child) {
-          return AnimatedButton(
-            height: 70,
-            width: 300,
-            text: widget.text,
-            isReverse: true,
-            selectedTextColor: Colors.black,
-            transitionType: TransitionType.LEFT_TOP_ROUNDER,
-            textStyle: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.w300,
-            ),
-            selectedBackgroundColor: Colors.white,
-            backgroundColor: Colors.black,
-            borderColor: Colors.white,
-            borderWidth: 2,
-            borderRadius: 15,
-            onPress: () {}, // This is still handled by GestureDetector
-            animationDuration: Duration(seconds: _animationDuration),
-            isSelected: isAnimating,
-          );
-        },
-      ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isAnimating,
+      builder: (context, isAnimating, child) {
+        return AnimatedButton(
+          height: 70,
+          width: 300,
+          text: widget.text,
+
+          isReverse: true,
+          selectedTextColor: Colors.black,
+          transitionType: TransitionType.LEFT_TOP_ROUNDER,
+          textStyle: const TextStyle(
+            fontFamily: "Google fonts",
+            fontSize: 20,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+          selectedBackgroundColor: Colors.white,
+          backgroundColor: Colors.black,
+          borderColor: Colors.white,
+          borderWidth: 2,
+          borderRadius: 15,
+          onPress: _onTap,
+          animationDuration: Duration(seconds: _animationDuration),
+          isSelected: isAnimating,
+        );
+      },
     );
   }
 
-  void _onTapDown() {
+  void _onTap() {
     if (!_isAnimating.value) {
       _isAnimating.value = true;
       _startVibration();
