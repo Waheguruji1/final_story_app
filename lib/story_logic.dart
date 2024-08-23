@@ -12,6 +12,7 @@ import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:share_plus/share_plus.dart';
 import 'story.dart';
 
+
 const String interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
 
 final currentStoryNodeProvider = StateProvider<String>((ref) => 'start');
@@ -434,7 +435,6 @@ class _StoryPageState extends ConsumerState<StoryPage> {
       },
     );
   }
-
 
 
 

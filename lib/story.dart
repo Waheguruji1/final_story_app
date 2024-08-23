@@ -5,7 +5,8 @@ class StoryNode {
   final List<Choice> choices;
   final String image;
 
-  StoryNode({required this.text, required this.animation, required this.choices,required this.image});
+
+  StoryNode({required this.text, required this.animation, required this.choices,required this.image,});
 }
 
 class Choice {
@@ -19,7 +20,8 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
   'Forest Adventure': {
     'start': StoryNode(
       text: 'You find yourself in a mysterious forest. What do you do?',
-      animation: 'app1.riv',
+      animation: 'rocket.riv',
+
       image: '',
       choices: [
         Choice(text: 'Explore deeper', nextNode: 'deep_forest'),
@@ -29,6 +31,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     'deep_forest': StoryNode(
       text: 'You discover an ancient ruin. Do you enter?',
       animation: 'app2.riv',
+
       image: '',
       choices: [
         Choice(text: 'Enter the ruin', nextNode: 'inside_ruin'),
@@ -38,6 +41,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     'forest_edge': StoryNode(
       text: 'You reach the edge of the forest and see a town in the distance.',
       animation: '',
+
       image: 'image1.jpg',
       choices: [
         Choice(text: 'Head towards the town', nextNode: 'town_entrance'),
@@ -47,6 +51,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     'inside_ruin': StoryNode(
       text: 'Inside the ruin, you find a magical artifact. What do you do?',
       animation: 'app2.riv',
+
       image: '',
       choices: [
         Choice(text: 'Take the artifact', nextNode: 'artifact_taken'),
@@ -56,6 +61,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     'magical_clearing': StoryNode(
       text: 'You stumble upon a magical clearing with fairy creatures.',
       animation: '',
+
       image: 'image2.jpg',
       choices: [
         Choice(text: 'Approach the fairies', nextNode: 'fairy_interaction'),
@@ -69,6 +75,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
       text: 'You wake up on a spaceship with no memory. What\'s your first move?',
       animation: 'spaceship_interior.riv',
       image: 'image2.jpg',
+
       choices: [
         Choice(text: 'Check the ship\'s computer', nextNode: 'computer_room'),
         Choice(text: 'Look out the window', nextNode: 'space_view'),
@@ -76,8 +83,9 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     ),
     'computer_room': StoryNode(
       text: 'The computer shows a distress signal from a nearby planet. What do you do?',
-      animation: 'computer_screen.riv',
+      animation: 'rocket.riv',
       image: '',
+
       choices: [
         Choice(text: 'Investigate the signal', nextNode: 'planet_approach'),
         Choice(text: 'Ignore it and try to return home', nextNode: 'space_journey'),
@@ -85,8 +93,9 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     ),
     'space_view': StoryNode(
       text: 'You see a strange alien ship approaching. How do you respond?',
-      animation: 'alien_ship.riv',
+      animation: 'rocket.riv',
       image: '',
+
       choices: [
         Choice(text: 'Try to communicate', nextNode: 'alien_contact'),
         Choice(text: 'Prepare for potential conflict', nextNode: 'ship_battle'),
@@ -94,8 +103,9 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
     ),
     'planet_approach': StoryNode(
       text: 'As you approach the planet, your ship starts malfunctioning. What\'s your plan?',
-      animation: 'planet_view.riv',
+      animation: 'rocket.riv',
       image: '',
+
       choices: [
         Choice(text: 'Attempt emergency landing', nextNode: 'crash_landing'),
         Choice(text: 'Try to fix the ship mid-flight', nextNode: 'space_repair'),
@@ -106,8 +116,9 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
   'Detective Mystery': {
     'start': StoryNode(
       text: 'A wealthy businessman has been murdered. Where do you begin your investigation?',
-      animation: 'crime_scene.riv',
+      animation: 'rocket.riv',
       image: '',
+
       choices: [
         Choice(text: 'Examine the body', nextNode: 'body_examination'),
         Choice(text: 'Interview the family', nextNode: 'family_interview'),
@@ -117,6 +128,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
       text: 'You find unusual marks on the victim\'s neck. What\'s your next step?',
       animation: 'forensic_closeup.riv',
       image: '',
+
       choices: [
         Choice(text: 'Analyze the marks in the lab', nextNode: 'lab_analysis'),
         Choice(text: 'Look for similar cases in the database', nextNode: 'database_search'),
@@ -126,6 +138,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
       text: 'The victim\'s wife seems nervous. Do you press her for more information?',
       animation: 'interview_room.riv',
       image: '',
+
       choices: [
         Choice(text: 'Press for more details', nextNode: 'wife_confession'),
         Choice(text: 'Thank her and investigate elsewhere', nextNode: 'office_search'),
@@ -135,6 +148,7 @@ final Map<String, Map<String, StoryNode>> storyMaps = {
       text: 'The lab results show traces of a rare poison. What\'s your theory?',
       animation: 'lab_results.riv',
       image: '',
+
       choices: [
         Choice(text: 'Professional hit', nextNode: 'hitman_lead'),
         Choice(text: 'Personal vendetta', nextNode: 'rival_investigation'),

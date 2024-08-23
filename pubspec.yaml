@@ -35,7 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
-  vibration: ^1.9.0
+  vibration: ^2.0.0
   google_mobile_ads: ^5.1.0
   flutter_riverpod: ^2.5.1
   rive: ^0.13.12
@@ -73,6 +73,7 @@ flutter:
   assets:
     - lib/Assets/app1.riv
     - lib/Assets/app2.riv
+    - lib/Assets/rocket.riv
     - lib/Assets/image1.jpg
     - lib/Assets/image2.jpg
 
