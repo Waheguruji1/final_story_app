@@ -379,24 +379,54 @@ class _StoryPageState extends ConsumerState<StoryPage> {
   }
 
   Widget _buildStoryText(StoryNode storyNode) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      child: AnimatedTextKit(
-        key: ValueKey(storyNode),
-        animatedTexts: [
-          TypewriterAnimatedText(
-            storyNode.text,
-            textStyle: TextStyle(fontFamily: "Google fonts",fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-            speed: Duration(milliseconds: 100),
-          ),
-        ],
-        totalRepeatCount: 1,
-        onFinished: () {
-          ref.read(textAnimationCompleteProvider.notifier).state = true;
-        },
+    final List<String> chunks = storyNode.text.split('. '); // Split text at each period followed by a space
+    final chunkIndexProvider = StateProvider<int>((ref) => 0); // To track the current chunk index
+    final isDisplayingProvider = StateProvider<bool>((ref) => false); // To control text reset and next display
 
-      ),
+    return Consumer(
+      builder: (context, ref, _) {
+        int currentIndex = ref.watch(chunkIndexProvider);
+        bool isDisplaying = ref.watch(isDisplayingProvider);
+
+        // If we're displaying a chunk, set it up in the animated text
+        String currentChunk = currentIndex < chunks.length ? chunks[currentIndex] : '';
+
+        if (!isDisplaying && currentIndex < chunks.length) {
+          // Trigger the display of the next chunk
+          Future.delayed(Duration(milliseconds: 500), () {
+            ref.read(isDisplayingProvider.notifier).state = true; // Mark as displaying
+          });
+        }
+
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: AnimatedTextKit(
+            key: ValueKey(currentChunk), // Key changes when chunk changes
+            animatedTexts: [
+              TypewriterAnimatedText(
+                currentChunk,
+                textStyle: TextStyle(fontFamily: "Google fonts", fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+                speed: Duration(milliseconds: 100),
+              ),
+            ],
+            totalRepeatCount: 1,
+            onFinished: () async {
+              // Reset and show next chunk after a delay
+              ref.read(isDisplayingProvider.notifier).state = false; // Reset displaying state
+
+              // Wait before clearing the screen
+              await Future.delayed(Duration(seconds: 2));
+              ref.read(chunkIndexProvider.notifier).state += 1; // Move to next chunk
+
+              if (ref.read(chunkIndexProvider) >= chunks.length) {
+                // If all chunks have been displayed, mark animation as complete
+                ref.read(textAnimationCompleteProvider.notifier).state = true;
+              }
+            },
+          ),
+        );
+      },
     );
   }
 
