@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rive/rive.dart' hide Image;
+import 'package:rive/rive.dart' hide Image,LinearGradient;
 import 'package:just_audio/just_audio.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -306,12 +306,19 @@ class _StoryPageState extends ConsumerState<StoryPage> {
                 height: double.infinity,
               ),
             ),
+            Positioned.fill(
+              child: RiveAnimation.asset(
+                'assets/star_animation.riv',
+                fit: BoxFit.cover, // Ensures full screen coverage
+                alignment: Alignment.center, // Centers the animation
+              ),
+            ),
             SafeArea(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     _buildStoryText(storyNode),
-                    _buildAnimation(storyNode),
+                    _buildImage(storyNode),
                     _buildChoices(storyNode),
                   ],
                 ),
@@ -436,33 +443,42 @@ class _StoryPageState extends ConsumerState<StoryPage> {
 
 
 
-  Widget _buildAnimation(StoryNode storyNode) {
-    return Builder(
-      builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.4,
-          child: FutureBuilder<RiveFile>(
-            future: RiveFile.asset('lib/Assets/${storyNode.animation}'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                return RiveAnimation.direct(
-                  snapshot.data!,
-                  fit: BoxFit.contain,
-                );
-              } else if (snapshot.hasError) {
-                // Fallback to image if Rive animation fails to load
-                return Image.asset(
-                  'lib/Assets/${storyNode.image}',
-                  fit: BoxFit.contain,
-                );
-              } else {
-                // Show a loading indicator while the animation is being loaded
-                return Center(child: CircularProgressIndicator());
-              }
-            },
+  Widget _buildImage(StoryNode storyNode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0), // Space above and below
+      child: storyNode.image.isNotEmpty
+          ? Container(
+        height: MediaQuery.of(context).size.height * 0.35,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0), // Curved edges
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF0D47A1), // Deep space blue
+              Color(0xFF673AB7), // Nebula purple
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        );
-      },
+          boxShadow: [
+            BoxShadow(
+              color: Colors.purpleAccent.withOpacity(0.3), // Soft purple glow
+              blurRadius: 12.0,
+              spreadRadius: 2.0,
+              offset: Offset(0, 4), // Floating effect
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.0), // Match curved edges
+          child: Image.asset(
+            'lib/Assets/${storyNode.image}',
+            fit: BoxFit.cover,
+          ),
+        ),
+      )
+          : SizedBox(
+        height: MediaQuery.of(context).size.height * 0.35, // Maintain layout space
+      ),
     );
   }
 
