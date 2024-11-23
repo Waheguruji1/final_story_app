@@ -318,7 +318,7 @@ class _StoryPageState extends ConsumerState<StoryPage> {
                 child: Column(
                   children: [
                     _buildStoryText(storyNode),
-                    _buildImage(storyNode),
+                    _buildSpacer(),
                     _buildChoices(storyNode),
                   ],
                 ),
@@ -443,44 +443,12 @@ class _StoryPageState extends ConsumerState<StoryPage> {
 
 
 
-  Widget _buildImage(StoryNode storyNode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0), // Space above and below
-      child: storyNode.image.isNotEmpty
-          ? Container(
-        height: MediaQuery.of(context).size.height * 0.35,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0), // Curved edges
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF0D47A1), // Deep space blue
-              Color(0xFF673AB7), // Nebula purple
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.purpleAccent.withOpacity(0.3), // Soft purple glow
-              blurRadius: 12.0,
-              spreadRadius: 2.0,
-              offset: Offset(0, 4), // Floating effect
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.0), // Match curved edges
-          child: Image.asset(
-            'lib/Assets/${storyNode.image}',
-            fit: BoxFit.cover,
-          ),
-        ),
-      )
-          : SizedBox(
-        height: MediaQuery.of(context).size.height * 0.35, // Maintain layout space
-      ),
+  Widget _buildSpacer() {
+    return SizedBox(
+      height: 20.0, // Adjust the height as needed
     );
   }
+
 
 
 
@@ -490,26 +458,40 @@ class _StoryPageState extends ConsumerState<StoryPage> {
     return textAnimationComplete
         ? Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: storyNode.choices
-          .map((choice) => Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: 8.0, horizontal: 16.0),
-        child: AnimatedTapButton(
-          text: choice.text,
-
-          onCompleted: () {
-            ref.read(currentStoryNodeProvider.notifier).state =
-                choice.nextNode;
-            _onNodeChange();
-          },
-          vibrationStrength: _vibrationStrength,
+      children: [
+        Flexible(
+          child: ListView.builder(
+            shrinkWrap: true, // Ensures the list takes only the required space
+            physics: NeverScrollableScrollPhysics(), // Avoid internal scrolling
+            itemCount: storyNode.choices.length,
+            itemBuilder: (context, index) {
+              final choice = storyNode.choices[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 16.0,
+                ),
+                child: AnimatedTapButton(
+                  text: choice.text,
+                  onCompleted: () {
+                    ref
+                        .read(currentStoryNodeProvider.notifier)
+                        .state = choice.nextNode;
+                    _onNodeChange();
+                  },
+                  vibrationStrength: _vibrationStrength,
+                ),
+              );
+            },
+          ),
         ),
-      ))
-          .toList(),
+      ],
     )
         : SizedBox.shrink();
   }
 }
+
+
 
 class AnimatedTapButton extends ConsumerStatefulWidget {
   final String text;
@@ -542,28 +524,30 @@ class _AnimatedTapButtonState extends ConsumerState<AnimatedTapButton> {
     return ValueListenableBuilder<bool>(
       valueListenable: _isAnimating,
       builder: (context, isAnimating, child) {
-        return AnimatedButton(
-          height: 70,
-          width: 300,
-          text: widget.text,
-
-          isReverse: true,
-          selectedTextColor: Colors.black,
-          transitionType: TransitionType.LEFT_TOP_ROUNDER,
-          textStyle: const TextStyle(
-            fontFamily: "Google fonts",
-            fontSize: 20,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
+        return IntrinsicWidth(
+          child: AnimatedButton(
+            height: 70,
+            width: 300, // Optional: Remove or adjust this to allow flexibility
+            text: widget.text,
+            isReverse: true,
+            selectedTextColor: Colors.black,
+            transitionType: TransitionType.LEFT_TOP_ROUNDER,
+            textStyle: const TextStyle(
+              fontFamily: "Google fonts",
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              overflow: TextOverflow.visible,
+            ),
+            selectedBackgroundColor: Colors.white,
+            backgroundColor: Colors.black,
+            borderColor: Colors.white,
+            borderWidth: 2,
+            borderRadius: 15,
+            onPress: _onTap,
+            animationDuration: Duration(seconds: _animationDuration),
+            isSelected: isAnimating,
           ),
-          selectedBackgroundColor: Colors.white,
-          backgroundColor: Colors.black,
-          borderColor: Colors.white,
-          borderWidth: 2,
-          borderRadius: 15,
-          onPress: _onTap,
-          animationDuration: Duration(seconds: _animationDuration),
-          isSelected: isAnimating,
         );
       },
     );
