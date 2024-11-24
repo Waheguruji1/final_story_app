@@ -70,12 +70,8 @@ flutter:
   uses-material-design: true
 
 
-  assets:
-    - lib/Assets/app1.riv
-    - lib/Assets/app2.riv
-    - lib/Assets/rocket.riv
-    - lib/Assets/image1.jpg
-    - lib/Assets/image2.jpg
+  // assets:
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
